@@ -18,45 +18,29 @@ TEST(MathUtilsTest, testBoundingBoxMinDistanceInsideBox) {
     EXPECT_EQ(dist, 0.0f);
 }
 
-TEST(MathUtilsTest, testBoundingBoxMinDistanceOutsideX) {
+struct BoundingBoxDistanceCase {
+    glm::vec3 point;
+    float expectedDistSq;
+};
+
+class BoundingBoxMinDistanceOutsideTest : public ::testing::TestWithParam<BoundingBoxDistanceCase> {};
+
+TEST_P(BoundingBoxMinDistanceOutsideTest, ReturnsCorrectSquaredDistance) {
     BoundingBox boundingBox(glm::vec3(0,0,0), glm::vec3(1,1,1));
+    auto param = GetParam();
 
-    float dist = boundingBox.minDistanceFromPointSq(glm::vec3(3,0,0));
+    float dist = boundingBox.minDistanceFromPointSq(param.point);
 
-    EXPECT_FLOAT_EQ(dist, 4.0f);  // (3-1)^2
+    EXPECT_FLOAT_EQ(dist, param.expectedDistSq);
 }
 
-TEST(MathUtilsTest, testBoundingBoxMinDistanceOutsideNegativeX) {
-    BoundingBox boundingBox(glm::vec3(0,0,0), glm::vec3(1,1,1));
-
-    float dist = boundingBox.minDistanceFromPointSq(glm::vec3(-2,0,0));
-
-    EXPECT_FLOAT_EQ(dist, 4.0f);  // (-2-0)^2
-}
-
-TEST(MathUtilsTest, testBoundingBoxMinDistanceOutsideY) {
-    BoundingBox boundingBox(glm::vec3(0,0,0), glm::vec3(1,1,1));
-
-    float dist = boundingBox.minDistanceFromPointSq(glm::vec3(0,4,0));
-
-    EXPECT_FLOAT_EQ(dist, 9.0f);  // (4-1)^2
-}
-
-TEST(MathUtilsTest, testBoundingBoxMinDistanceOutsideZ) {
-    BoundingBox boundingBox(glm::vec3(0,0,0), glm::vec3(1,1,1));
-
-    float dist = boundingBox.minDistanceFromPointSq(glm::vec3(0,0,-3));
-
-    EXPECT_FLOAT_EQ(dist, 9.0f);  // (-3-0)^2
-}
-
-TEST(MathUtilsTest, testBoundingBoxMinDistanceDiagonal) {
-    BoundingBox boundingBox(glm::vec3(0,0,0), glm::vec3(1,1,1));
-
-    float dist = boundingBox.minDistanceFromPointSq(glm::vec3(2,2,2));
-
-    EXPECT_FLOAT_EQ(dist, 3.0f);  // (2-1)^2 + (2-1)^2 + (2-1)^2
-}
+INSTANTIATE_TEST_SUITE_P(OutsideCases, BoundingBoxMinDistanceOutsideTest, ::testing::Values(
+    BoundingBoxDistanceCase{glm::vec3( 3, 0, 0), 4.0f},  // (3-1)^2
+    BoundingBoxDistanceCase{glm::vec3(-2, 0, 0), 4.0f},  // (-2-0)^2
+    BoundingBoxDistanceCase{glm::vec3( 0, 4, 0), 9.0f},  // (4-1)^2
+    BoundingBoxDistanceCase{glm::vec3( 0, 0,-3), 9.0f},  // (-3-0)^2
+    BoundingBoxDistanceCase{glm::vec3( 2, 2, 2), 3.0f}   // (2-1)^2 * 3 axes
+));
 
 TEST(MathUtilsTest, testIntersectSphereSqIntersects) {
     BoundingBox boundingBox(glm::vec3(0,0,0), glm::vec3(1,1,1));
