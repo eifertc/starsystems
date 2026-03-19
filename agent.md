@@ -101,6 +101,10 @@ Camera position -> View frustum culling -> TerrainManager selects visible Terrai
 - **Error handling:** `fprintf(stderr, ...)` warnings, minimal exceptions
 - **Threading:** global `g_threadPool` (ThreadPool) for background work
 
+## GitHub Credentials
+
+Git push credentials are stored in `~/.githubcredentials`.
+
 ## Globals (include/global.hpp)
 
 - `g_deltaTime` - frame delta time
